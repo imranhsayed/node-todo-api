@@ -52,7 +52,5 @@ app.listen( 3000, () => {
 	console.log( 'Started on port 3000' );
 } );
 
-
-
-
-
+// Export the app so that its available to other file when they require this file.
+module.exports = {app};
