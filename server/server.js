@@ -52,5 +52,17 @@ app.listen( 3000, () => {
 	console.log( 'Started on port 3000' );
 } );
 
+/**
+ * Set the get route to get all Todos
+ *
+ */
+app.get( '/todos', ( req, res ) => {
+	Todo.find().then( ( todos ) => {
+		res.send( { todos } );
+	}, ( error ) => {
+		res.status( 400 ).send(error);
+	} )
+} );
+
 // Export the app so that its available to other file when they require this file.
 module.exports = {app};
