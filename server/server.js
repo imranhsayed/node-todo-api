@@ -15,6 +15,9 @@ let {ObjectID} = require( 'mongodb' );
 // Create a server using express js.
 let app = express();
 
+// If the process.env.PORT is there we will use that otherwise we will use port 3000
+const port = process.env.PORT || 3000;
+
 /**
  * Configure the middleware.
  * bodyParser.json() returns a function that is passed as a param to app.use() as middleware
@@ -49,9 +52,6 @@ app.post( '/todos', ( req, res ) => {
 		res.status(400).send( error );
 	});
 } );
-app.listen( 3000, () => {
-	console.log( 'Started on port 3000' );
-} );
 
 /**
  * Set the get route to get all Todos
@@ -84,5 +84,8 @@ app.get( '/todos/:id', ( req, res ) => {
 	} )
 });
 
+app.listen( port, () => {
+	console.log( `Started on port ${port}` );
+} );
 // Export the app so that its available to other file when they require this file.
 module.exports = {app};

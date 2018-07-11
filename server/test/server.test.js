@@ -16,7 +16,7 @@ const todos = [
 beforeEach( ( done ) => {
 	Todo.remove({}).then( () => {
 		done();
-	} )
+	} );
 } );
 
 describe( 'POST /todos', () => {
