@@ -1,19 +1,20 @@
-// Require express js and body-parser libraries.
-let express = require( 'express' );
-let bodyParser = require( 'body-parser' );
+// Require lodash, express js and body-parser libraries.
+const _ = require( 'lodash' );
+const express = require( 'express' );
+const bodyParser = require( 'body-parser' );
 /**
  * We are using the ES6 destructuring down below to create a variable out of its property name and setting
  * it equal to the object that comes back frm require(). The value of mongoose will be equal to
  * to the property value of the object that comes back from require()
  * And requiring mongoose object from db/mongoose.js file. Similarly for Todo and User.
  */
-let {mongoose} = require( './db/mongoose' );
-let {Todo} = require( './models/todo' );
-let {User} = require( './models/user' );
-let {ObjectID} = require( 'mongodb' );
+const {mongoose} = require( './db/mongoose' );
+const {Todo} = require( './models/todo' );
+const {User} = require( './models/user' );
+const {ObjectID} = require( 'mongodb' );
 
 // Create a server using express js.
-let app = express();
+const app = express();
 
 // If the process.env.PORT is there we will use that otherwise we will use port 3000
 const port = process.env.PORT || 3000;
@@ -115,6 +116,55 @@ app.delete( '/todos/:id', ( req, res ) => {
 		res.status( 400 ).send();
 	} );
 });
+
+/**
+ * CRUD: UPDATE
+ * Set a route for updating an document with its ID
+ */
+app.patch( '/todos/:id', ( req, res ) => {
+
+	// Get the id from url using req.params.id
+	let id = req.params.id;
+
+	// If the id is invalid send the response as 404 and do not proceed
+	if ( ! ObjectID.isValid( id ) ) {
+		return res.status( 404 ).send();
+	}
+
+	/**
+	 * body will store all the request updates
+	 * _.pick() is a lodash module function is used to pick up the properties that user want to update, if those property exist.
+	 * _.pick() takes first parameter as req.body and second as an object containing the property names you want to update.
+	 */
+	let body = _.pick( req.body, [ 'text', 'completed' ] );
+
+	/**
+	 * If the entered value for completed is boolean, and if its true.
+	 */
+	if ( _.isBoolean( body.completed ) && body.completed ) {
+		// getTime() returns unique timestamp
+	    body.completedAt = new Date().getTime();
+	} else {
+		body.completed = false;
+		// if you want to remove a value from the database you set it to null
+		body.completedAt = null;
+	}
+
+	/**
+	 * Update the document
+	 * by setting $set equal to body we will update the database with the values inside of body var.
+	 * setting new: true, will give us the new updated object in todo var
+	 */
+	Todo.findByIdAndUpdate( id, { $set: body }, { new: true } ).then( ( todo ) => {
+		if ( ! todo ) {
+		    return res.status( 404 ).send();
+		}
+
+		res.send( { todo } );
+	} ).catch( ( e ) => {
+		res.status( 400 ).send();
+	} );
+} );
 
 app.listen( port, () => {
 	console.log( `Started on port ${port}` );
