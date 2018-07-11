@@ -26,6 +26,7 @@ const port = process.env.PORT || 3000;
 app.use( bodyParser.json() );
 
 /**
+ * CRUD: CREATE
  * Set up a post route for Create post request,
  * '/todos' is the url
  * body-parser module included above will convert the JSON data, convert it into an object and attach it to 'req' below
@@ -54,6 +55,7 @@ app.post( '/todos', ( req, res ) => {
 } );
 
 /**
+ * CRUD: READ
  * Set the get route to get all Todos
  *
  */
@@ -66,6 +68,7 @@ app.get( '/todos', ( req, res ) => {
 } );
 
 /**
+ * CRUD: READ
  * Set the get route with an ID.
  * :id will create an id variable which will be available on the req object in req.params.id
  */
@@ -82,6 +85,35 @@ app.get( '/todos/:id', ( req, res ) => {
 	}).catch( ( err ) => {
 		res.status( 400 ).send();
 	} )
+});
+
+/**
+ * CRUD: DELETE
+ * Set a route for deleting an document with its ID
+ */
+app.delete( '/todos/:id', ( req, res ) => {
+	// Get the id from url using req.params.id
+	let id = req.params.id;
+
+	// If the id is invalid send the response as 404 and do not proceed
+	if ( ! ObjectID.isValid( id ) ) {
+	    return res.status( 404 ).send();
+	}
+
+	/**
+	 * If the id was valid find the document by id and remove it
+	 * doc will contain the document/item deleted.
+	 * if document was not found send response as 404 , 200 otherwise.
+	 */
+	Todo.findByIdAndRemove( id ).then( ( doc ) => {
+		if ( ! doc ) {
+			return res.status( 404 ).send();
+		} else {
+			return res.status( 200 ).send();
+		}
+	} ).catch( ( e ) => {
+		res.status( 400 ).send();
+	} );
 });
 
 app.listen( port, () => {
