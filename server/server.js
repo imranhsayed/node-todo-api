@@ -166,6 +166,46 @@ app.patch( '/todos/:id', ( req, res ) => {
 	} );
 } );
 
+
+/**
+ * CRUD: CREATE
+ * Set up a post route for Create users request,
+ * '/users' is the url
+ * body-parser module included above will convert the JSON data, convert it into an object and attach it to 'req' below
+ */
+app.post( '/users', ( req, res ) => {
+
+	let body = _.pick( req.body, [ 'email', 'password' ] );
+	/**
+	 * Create a new instance of Todo model set the values of the properties(fields)
+	 * body contains both email and password values, hence we are passing body as param when creating a new document.
+	 */
+	let user = new User( body );
+
+	/**
+	 * By calling a method save on the new instance 'todo' of Todo model, we save the this data into Todo collection.
+	 * Because save() returns a promise, we can call a then() which will be execute after the data is saved.
+	 */
+	user.save().then( () => {
+
+		return user.generateAuthToken();
+
+	}, ).then( ( token ) => {
+
+		/**
+		 * res.header().send() will send the user data
+		 * in header() param key is the header name and value is token value,
+		 * when you prefix a header with x , you are creating a custom header.
+		 */
+
+		res.header( 'x-auth', token ).send( user );
+	} ).catch( ( error ) => {
+			// res.send will send error if the data is not inserted and there was an error with the status of 400(bad request)
+			res.status(500).send( error );
+	} );
+} );
+
+
 app.listen( port, () => {
 	console.log( `Started on port ${port}` );
 } );
