@@ -199,9 +199,9 @@ app.post( '/users', ( req, res ) => {
 		 */
 
 		res.header( 'x-auth', token ).send( user );
-	} ).catch( ( error ) => {
+	} ).catch( ( e ) => {
 			// res.send will send error if the data is not inserted and there was an error with the status of 400(bad request)
-			res.status(500).send( error );
+			res.status(500).send( e );
 	} );
 } );
 
